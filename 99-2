@@ -1,0 +1,134 @@
+#!/bin/bash
+
+set -e
+
+# 1. change /etc/ssh/sshd_config langsung dari isi dalam script
+echo "🔧 re-write /etc/ssh/sshd_config ..."
+cat <<'EOF' > /etc/ssh/sshd_config
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+Include /etc/ssh/sshd_config.d/*.conf
+
+Port 22
+PermitRootLogin yes
+MaxAuthTries 6
+PasswordAuthentication yes
+KbdInteractiveAuthentication no
+UsePAM yes
+X11Forwarding yes
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem	sftp	/usr/lib/openssh/sftp-server
+ClientAliveInterval 120
+EOF
+
+systemctl restart sshd
+
+# 2. change ~/.bashrc
+echo "🔧 change ~/.bashrc ..."
+#sed -i "s/^#\(alias ll='ls.*-l'\)/\1/" ~/.bashrc
+
+cat <<'EOF' >> ~/.bashrc
+
+# Custom aliases
+alias ll='ls $LS_OPTIONS -l'
+alias cdr='cd /software/站点配置文件'
+alias cdroot='cd /usr/local/openresty/nginx/html/'
+alias cdk='vim /usr/local/openresty/nginx/conf/nginx.conf'
+alias tb='bash /root/copy_file.sh'
+EOF
+
+# 3. run source ~/.bashrc
+echo "🔄 run source ~/.bashrc ..."
+source ~/.bashrc
+
+
+# 4. OpenResty installation
+echo "🌐 OpenResty installation ..."
+apt update
+apt-get install -y curl gnupg2 ca-certificates lsb-release
+curl -O https://openresty.org/package/pubkey.gpg
+gpg --dearmor -o /usr/share/keyrings/openresty.gpg pubkey.gpg
+echo "deb [signed-by=/usr/share/keyrings/openresty.gpg] http://openresty.org/package/debian bullseye openresty" > /etc/apt/sources.list.d/openresty.list
+apt update
+apt-get install -y openresty
+systemctl enable --now openresty
+
+
+# 5. Install PHP dan modify www.conf
+echo "📦 PHP installation ..."
+apt install -y php php-cli php-fpm php-mysql php-curl php-mbstring php-xml php-zip php-gd
+systemctl enable php8.2-fpm
+systemctl start php8.2-fpm
+
+echo "⚙️ Modify /etc/php/8.2/fpm/pool.d/www.conf ..."
+PHP_CONF="/etc/php/8.2/fpm/pool.d/www.conf"
+sed -i 's|^listen = /run/php/php8.2-fpm.sock|;listen = /run/php/php8.2-fpm.sock\nlisten = 127.0.0.1:9000|' "$PHP_CONF"
+systemctl restart php8.2-fpm
+
+# 6. rsync installation
+echo "📥 rsync installation ..."
+apt install -y rsync
+
+# 7. create swap
+echo "💾 create swapfile ..."
+fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1024 count=2097152
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+
+# 8. add public SSH key to ~/.ssh/authorized_keys
+echo "🔑 add public SSH key to ~/.ssh/authorized_keys ..."
+
+SSH_KEY='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCq91yFmcQdps+VTnvmu06AxXpu+gykskohhN2wBDZkIKPlMtjSwwEPL7ghMrhgStJAnHJ/m9psYB6W40V6ABAOmkiV7Zd9+a1BmcoWIafNH90Jflz9/+7u3HcUgElNM54/tR9C4g6PmGH9SZd+Fe7VJZ/f2jrBThVWVrHGJzmwXb4XFYKxjg0RuUfRCtgrns7kB93Ineb07hgbS1h/IIteWMJs/CfBVu2RAgj1BLjRwAI4q/jnCD/nO+P+PeKTlEjUlY5YHpvw7sFBmZRpy+601ng2a0XJaGbYuqghdYpCa4Y2vGludzbFkaLQtSKzX8QuuIzOyeoNl0DbpiWLqHRL'
+
+SSH_DIR="/root/.ssh"
+AUTHORIZED_KEYS="$SSH_DIR/authorized_keys"
+
+mkdir -p "$SSH_DIR"
+touch "$AUTHORIZED_KEYS"
+chmod 700 "$SSH_DIR"
+chmod 600 "$AUTHORIZED_KEYS"
+
+# Cek apakah key sudah ada agar tidak duplikat
+if ! grep -Fxq "$SSH_KEY" "$AUTHORIZED_KEYS"; then
+    echo "$SSH_KEY" >> "$AUTHORIZED_KEYS"
+    echo "✅ SSH key added."
+else
+    echo "ℹ️ SSH key already exists in authorized_keys."
+fi
+
+
+# 9. syncronize time
+echo "✅ syncronize time"
+#修改时间
+rm -rf /etc/localtime
+ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+echo "pool time.windows.com iburst" >> /etc/chrony.conf
+hwclock -w
+hwclock -s
+
+
+# 10. Add to /etc/hosts.allow
+echo "✅ Menambah ke /etc/hosts.allow ..."
+echo 'sshd: 35.220.246.77, 47.244.62.17, 35.241.77.5' >> /etc/hosts.allow
+
+# 11. Add to /etc/hosts.deny
+echo "🚫 Menambah ke /etc/hosts.deny ..."
+echo 'sshd: ALL' >> /etc/hosts.deny
+
+# 12. Disable Apache
+echo "🚫 Disable apache2 ..."
+systemctl stop apache2 || true
+systemctl disable apache2 || true
+
+
+# 13. Process done
+echo "✅ Process done, try add in jumpserver"
+
+# 14. Restart sshd 
+echo "🔁 Restart sshd ..."
+systemctl restart sshd
