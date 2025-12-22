@@ -1,0 +1,201 @@
+#!/bin/bash
+
+set -e
+
+# ===============================
+# 1️⃣ Re-write /etc/ssh/sshd_config
+# ===============================
+echo "🔧 re-write /etc/ssh/sshd_config ..."
+cat <<'EOF' > /etc/ssh/sshd_config
+Include /etc/ssh/sshd_config.d/*.conf
+
+Port 22
+PermitRootLogin yes
+MaxAuthTries 6
+PasswordAuthentication yes
+KbdInteractiveAuthentication no
+UsePAM yes
+X11Forwarding yes
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem	sftp	/usr/lib/openssh/sftp-server
+ClientAliveInterval 120
+EOF
+
+systemctl restart sshd
+
+# ===============================
+# 2️⃣ Change ~/.bashrc
+# ===============================
+echo "🔧 change ~/.bashrc ..."
+cat <<'EOF' >> ~/.bashrc
+
+# Custom aliases
+alias ll='ls $LS_OPTIONS -l'
+alias cdr='cd /software/站点配置文件'
+alias cdroot='cd /usr/local/openresty/nginx/html/'
+alias cdk='vim /usr/local/openresty/nginx/conf/nginx.conf'
+alias tb='bash /root/copy_file.sh'
+EOF
+
+source ~/.bashrc
+
+# ===============================
+# 3️⃣ OpenResty installation
+# ===============================
+echo "🌐 OpenResty installation ..."
+apt update
+apt-get install -y curl gnupg2 ca-certificates lsb-release
+curl -O https://openresty.org/package/pubkey.gpg
+gpg --dearmor -o /usr/share/keyrings/openresty.gpg pubkey.gpg
+echo "deb [signed-by=/usr/share/keyrings/openresty.gpg] http://openresty.org/package/debian bullseye openresty" > /etc/apt/sources.list.d/openresty.list
+apt update
+apt-get install -y openresty
+systemctl enable --now openresty
+
+# ===============================
+# 4️⃣ PHP installation
+# ===============================
+echo "📦 PHP installation ..."
+apt install -y php php-cli php-fpm php-mysql php-curl php-mbstring php-xml php-zip php-gd
+systemctl enable php8.2-fpm
+systemctl start php8.2-fpm
+
+echo "⚙️ Modify /etc/php/8.2/fpm/pool.d/www.conf ..."
+PHP_CONF="/etc/php/8.2/fpm/pool.d/www.conf"
+sed -i 's|^listen = /run/php/php8.2-fpm.sock|;listen = /run/php/php8.2-fpm.sock\nlisten = 127.0.0.1:9000|' "$PHP_CONF"
+systemctl restart php8.2-fpm
+
+# ===============================
+# 5️⃣ rsync installation
+# ===============================
+echo "📥 rsync installation ..."
+apt install -y rsync
+
+# ===============================
+# 6️⃣ create swap
+# ===============================
+echo "💾 create swapfile ..."
+fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1024 count=2097152
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+# ===============================
+# 7️⃣ add public SSH key
+# ===============================
+echo "🔑 add public SSH key ..."
+SSH_KEY='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCq91yFmcQdps+VTnvmu06AxXpu+gykskohhN2wBDZkIKPlMtjSwwEPL7ghMrhgStJAnHJ/m9psYB6W40V6ABAOmkiV7Zd9+a1BmcoWIafNH90Jflz9/+7u3HcUgElNM54/tR9C4g6PmGH9SZd+Fe7VJZ/f2jrBThVWVrHGJzmwXb4XFYKxjg0RuUfRCtgrns7kB93Ineb07hgbS1h/IIteWMJs/CfBVu2RAgj1BLjRwAI4q/jnCD/nO+P+PeKTlEjUlY5YHpvw7sFBmZRpy+601ng2a0XJaGbYuqghdYpCa4Y2vGludzbFkaLQtSKzX8QuuIzOyeoNl0DbpiWLqHRL'
+
+SSH_DIR="/root/.ssh"
+AUTHORIZED_KEYS="$SSH_DIR/authorized_keys"
+
+mkdir -p "$SSH_DIR"
+touch "$AUTHORIZED_KEYS"
+chmod 700 "$SSH_DIR"
+chmod 600 "$AUTHORIZED_KEYS"
+
+if ! grep -Fxq "$SSH_KEY" "$AUTHORIZED_KEYS"; then
+    echo "$SSH_KEY" >> "$AUTHORIZED_KEYS"
+    echo "✅ SSH key added."
+else
+    echo "ℹ️ SSH key already exists in authorized_keys."
+fi
+
+# ===============================
+# 8️⃣ synchronize time
+# ===============================
+echo "✅ synchronize time"
+rm -rf /etc/localtime
+ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+echo "pool time.windows.com iburst" >> /etc/chrony.conf
+hwclock -w
+hwclock -s
+
+# ===============================
+# 9️⃣ hosts.allow & hosts.deny
+# ===============================
+echo "✅ Menambah ke /etc/hosts.allow ..."
+echo 'sshd: 35.220.246.77, 47.244.62.17, 35.241.77.5' >> /etc/hosts.allow
+
+echo "🚫 Menambah ke /etc/hosts.deny ..."
+echo 'sshd: ALL' >> /etc/hosts.deny
+
+# ===============================
+# 10️⃣ Disable Apache
+# ===============================
+echo "🚫 Disable apache2 ..."
+systemctl stop apache2 || true
+systemctl disable apache2 || true
+
+# ===============================
+# 11️⃣ Restart sshd
+# ===============================
+echo "🔁 Restart sshd ..."
+systemctl restart sshd
+
+# ===============================
+# 12️⃣ Install JumpServer otomatis
+# ===============================
+echo "🚀 Install JumpServer dengan Docker ..."
+
+# Install Docker & Docker Compose jika belum
+apt install -y docker.io docker-compose git
+
+systemctl enable docker
+systemctl start docker
+
+# Buat folder JumpServer
+mkdir -p ~/jumpserver
+cd ~/jumpserver
+
+# Clone repositori
+git clone https://github.com/jumpserver/jms-docker.git .
+cp env.example .env
+
+# Setup admin username/password
+read -p "Masukkan username admin JumpServer: " ADMIN_USER
+read -p "Masukkan password admin JumpServer: " ADMIN_PASS
+read -p "Masukkan domain/subdomain untuk SSL (misal jump.mydomain.com): " DOMAIN
+
+sed -i "s/^JMS_ADMIN_USERNAME=.*/JMS_ADMIN_USERNAME=$ADMIN_USER/" .env
+sed -i "s/^JMS_ADMIN_PASSWORD=.*/JMS_ADMIN_PASSWORD=$ADMIN_PASS/" .env
+sed -i "s/^JMS_LISTEN=.*/JMS_LISTEN=0.0.0.0/" .env
+sed -i "s/^JMS_PORT=.*/JMS_PORT=8080/" .env
+
+# Jalankan JumpServer
+docker-compose up -d
+
+# ===============================
+# 13️⃣ Firewall & IP Whitelist
+# ===============================
+MYIP=$(curl -s ifconfig.me)
+echo "🛡️ Konfigurasi firewall dan IP Whitelist untuk $MYIP ..."
+ufw default deny incoming
+ufw allow ssh
+ufw allow from $MYIP to any port 8080
+ufw enable
+
+# ===============================
+# 14️⃣ SSL Gratis via acme.sh
+# ===============================
+echo "🔑 Install acme.sh untuk SSL gratis ..."
+curl https://get.acme.sh | sh
+export PATH="$HOME/.acme.sh:$PATH"
+
+~/.acme.sh/acme.sh --issue --standalone -d $DOMAIN --force
+~/.acme.sh/acme.sh --install-cert -d $DOMAIN \
+    --key-file       /etc/ssl/private/jumpserver.key \
+    --fullchain-file /etc/ssl/certs/jumpserver.crt \
+    --reloadcmd     "docker restart jumpserver"
+
+docker restart jumpserver
+
+# ===============================
+# 15️⃣ Selesai
+# ===============================
+echo "✅ JumpServer siap digunakan!"
+echo "Buka browser: https://$DOMAIN"
+echo "Login dengan user: $ADMIN_USER / $ADMIN_PASS"
+echo "Hanya IP $MYIP yang bisa mengakses JumpServer"
