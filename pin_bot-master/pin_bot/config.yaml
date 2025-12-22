@@ -1,0 +1,9 @@
+---
+bot_id: 1373107653:AAGr1t6n7QFpYZhV8k64E3GTa_I-rmBzeMc
+counter: 200
+loki:
+  url: https://loki.qsjtyw.com
+  api: /loki/api/v1/query
+  enabled: true
+  mg_job: mg_cdn1_access
+  gz_job: gz_cdn1_access
