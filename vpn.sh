@@ -1,0 +1,207 @@
+#!/bin/bash
+#
+# Automatic IPsec/L2TP VPN setup for Debian 10/11/12
+# Converted from CentOS 6/7 legacy script
+#
+
+set -e
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+SYS_DT=$(date +%F-%T)
+
+### ===============================
+### USER CONFIG
+### ===============================
+YOUR_USERNAME=''
+YOUR_PASSWORD=''
+YOUR_IPSEC_PSK=''
+
+gen() { tr -dc 'A-HJ-NPR-Za-km-z2-9' </dev/urandom | head -c "$1"; }
+
+[ -z "$YOUR_USERNAME" ] && VPN_USER="vpnuser" || VPN_USER="$YOUR_USERNAME"
+[ -z "$YOUR_PASSWORD" ] && VPN_PASSWORD=$(gen 16) || VPN_PASSWORD="$YOUR_PASSWORD"
+[ -z "$YOUR_IPSEC_PSK" ] && VPN_IPSEC_PSK=$(gen 20) || VPN_IPSEC_PSK="$YOUR_IPSEC_PSK"
+
+exiterr() { echo "ERROR: $1" >&2; exit 1; }
+conf_bk() { cp -f "$1" "$1.old-$SYS_DT" 2>/dev/null || true; }
+bigecho() { echo; echo "## $1"; echo; }
+
+### ===============================
+### CHECK ROOT + OS
+### ===============================
+[ "$(id -u)" != 0 ] && exiterr "Run as root"
+
+if ! grep -qs debian /etc/os-release; then
+  exiterr "This script supports Debian only"
+fi
+
+### ===============================
+### INSTALL PACKAGES
+### ===============================
+bigecho "Installing required packages..."
+
+apt update
+DEBIAN_FRONTEND=noninteractive apt -y install \
+  iptables iptables-persistent \
+  libreswan xl2tpd ppp \
+  wget curl dnsutils \
+  fail2ban net-tools
+
+### ===============================
+### PUBLIC IP DETECT
+### ===============================
+bigecho "Detecting public IP..."
+PUBLIC_IP=$(dig +short myip.opendns.com @resolver1.opendns.com || true)
+[ -z "$PUBLIC_IP" ] && PUBLIC_IP=$(curl -4 -s ifconfig.me)
+[ -z "$PUBLIC_IP" ] && exiterr "Cannot detect public IP"
+
+### ===============================
+### SYSCTL
+### ===============================
+bigecho "Applying sysctl tuning..."
+conf_bk /etc/sysctl.conf
+cat >>/etc/sysctl.conf <<EOF
+
+# Added by VPN script
+net.ipv4.ip_forward=1
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.all.rp_filter=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.default.send_redirects=0
+net.ipv4.conf.default.rp_filter=0
+EOF
+sysctl -p
+
+### ===============================
+### IPSEC CONFIG
+### ===============================
+bigecho "Configuring IPsec..."
+conf_bk /etc/ipsec.conf
+cat >/etc/ipsec.conf <<EOF
+config setup
+  uniqueids=no
+
+conn shared
+  left=%defaultroute
+  leftid=$PUBLIC_IP
+  right=%any
+  encapsulation=yes
+  authby=secret
+  pfs=no
+  rekey=no
+  ikev2=never
+
+conn l2tp-psk
+  auto=add
+  leftprotoport=17/1701
+  rightprotoport=17/%any
+  type=transport
+  phase2=esp
+  also=shared
+EOF
+
+conf_bk /etc/ipsec.secrets
+echo "%any %any : PSK \"$VPN_IPSEC_PSK\"" >/etc/ipsec.secrets
+chmod 600 /etc/ipsec.secrets
+
+### ===============================
+### XL2TPD
+### ===============================
+bigecho "Configuring xl2tpd..."
+
+conf_bk /etc/xl2tpd/xl2tpd.conf
+cat >/etc/xl2tpd/xl2tpd.conf <<EOF
+[global]
+port = 1701
+
+[lns default]
+ip range = 192.168.42.10-192.168.42.250
+local ip = 192.168.42.1
+require chap = yes
+refuse pap = yes
+pppoptfile = /etc/ppp/options.xl2tpd
+length bit = yes
+EOF
+
+conf_bk /etc/ppp/options.xl2tpd
+cat >/etc/ppp/options.xl2tpd <<EOF
++mschap-v2
+auth
+mtu 1280
+mru 1280
+ms-dns 8.8.8.8
+ms-dns 1.1.1.1
+EOF
+
+conf_bk /etc/ppp/chap-secrets
+echo "$VPN_USER l2tpd $VPN_PASSWORD *" >/etc/ppp/chap-secrets
+chmod 600 /etc/ppp/chap-secrets
+
+### ===============================
+### IPTABLES (LEGACY STYLE)
+### ===============================
+bigecho "Applying iptables rules..."
+
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p udp --dport 500 -j ACCEPT
+iptables -A INPUT -p udp --dport 4500 -j ACCEPT
+iptables -A INPUT -p udp --dport 1701 -m policy --dir in --pol ipsec -j ACCEPT
+iptables -A INPUT -p udp --dport 1701 -j DROP
+
+iptables -A FORWARD -i ppp+ -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth0 -o ppp+ -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -t nat -A POSTROUTING -s 192.168.42.0/24 -o eth0 -j MASQUERADE
+
+iptables-save >/etc/iptables/rules.v4
+
+### ===============================
+### FAIL2BAN
+### ===============================
+bigecho "Configuring Fail2Ban..."
+
+cat >/etc/fail2ban/jail.local <<EOF
+[sshd]
+enabled = true
+port = ssh
+logpath = /var/log/auth.log
+backend = systemd
+EOF
+
+systemctl enable fail2ban
+
+### ===============================
+### RC.LOCAL WORKAROUND
+### ===============================
+if [ ! -f /etc/rc.local ]; then
+cat >/etc/rc.local <<EOF
+#!/bin/sh
+modprobe pppol2tp
+systemctl restart ipsec
+systemctl restart xl2tpd
+exit 0
+EOF
+chmod +x /etc/rc.local
+fi
+
+### ===============================
+### START SERVICES
+### ===============================
+bigecho "Starting services..."
+systemctl enable ipsec xl2tpd
+systemctl restart ipsec xl2tpd fail2ban
+
+### ===============================
+### OUTPUT
+### ===============================
+cat <<EOF
+
+====================================
+ IPsec VPN READY (Debian)
+====================================
+ Server IP : $PUBLIC_IP
+ Username  : $VPN_USER
+ Password  : $VPN_PASSWORD
+ PSK       : $VPN_IPSEC_PSK
+====================================
+
+EOF
