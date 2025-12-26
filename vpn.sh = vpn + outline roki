@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# Automatic IPsec/L2TP VPN + Shadowsocks setup for Debian 10/11/12
-# Converted from CentOS 6/7 legacy script
+# Automatic IPsec/L2TP VPN + Shadowsocks for Rocky Linux 8/9
 #
 
 set -e
@@ -36,25 +35,34 @@ bigecho() { echo; echo "## $1"; echo; }
 ### ===============================
 [ "$(id -u)" != 0 ] && exiterr "Run as root"
 
-if ! grep -qs debian /etc/os-release; then
-  exiterr "This script supports Debian only"
+if ! grep -qs rocky /etc/os-release; then
+  exiterr "This script supports Rocky Linux only"
 fi
+
+### ===============================
+### NETWORK INTERFACE
+### ===============================
+DEF_IFACE=$(ip route get 1.1.1.1 | awk '{print $5; exit}')
 
 ### ===============================
 ### INSTALL PACKAGES
 ### ===============================
 bigecho "Installing required packages..."
 
-apt update
-DEBIAN_FRONTEND=noninteractive apt -y install \
-  iptables iptables-persistent \
+dnf -y install epel-release
+dnf -y update
+
+dnf -y install \
+  iptables iptables-services \
   libreswan xl2tpd ppp \
   shadowsocks-libev \
-  wget curl dnsutils \
+  wget curl bind-utils \
   fail2ban net-tools
 
+systemctl enable iptables
+
 ### ===============================
-### PUBLIC IP DETECT
+### PUBLIC IP
 ### ===============================
 bigecho "Detecting public IP..."
 PUBLIC_IP=$(dig +short myip.opendns.com @resolver1.opendns.com || true)
@@ -64,7 +72,8 @@ PUBLIC_IP=$(dig +short myip.opendns.com @resolver1.opendns.com || true)
 ### ===============================
 ### SYSCTL
 ### ===============================
-bigecho "Applying sysctl tuning..."
+bigecho "Applying sysctl..."
+
 conf_bk /etc/sysctl.conf
 cat >>/etc/sysctl.conf <<EOF
 
@@ -77,12 +86,14 @@ net.ipv4.conf.default.accept_redirects=0
 net.ipv4.conf.default.send_redirects=0
 net.ipv4.conf.default.rp_filter=0
 EOF
+
 sysctl -p
 
 ### ===============================
 ### IPSEC CONFIG
 ### ===============================
 bigecho "Configuring IPsec..."
+
 conf_bk /etc/ipsec.conf
 cat >/etc/ipsec.conf <<EOF
 config setup
@@ -145,11 +156,13 @@ echo "$VPN_USER l2tpd $VPN_PASSWORD *" >/etc/ppp/chap-secrets
 chmod 600 /etc/ppp/chap-secrets
 
 ### ===============================
-### SHADOWSOCKS CONFIG
+### SHADOWSOCKS
 ### ===============================
 bigecho "Configuring Shadowsocks..."
 
+mkdir -p /etc/shadowsocks-libev
 conf_bk /etc/shadowsocks-libev/config.json
+
 cat >/etc/shadowsocks-libev/config.json <<EOF
 {
   "server":"0.0.0.0",
@@ -166,9 +179,12 @@ systemctl enable shadowsocks-libev
 systemctl restart shadowsocks-libev
 
 ### ===============================
-### IPTABLES (LEGACY STYLE)
+### IPTABLES
 ### ===============================
 bigecho "Applying iptables rules..."
+
+iptables -F
+iptables -t nat -F
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -p udp --dport 500 -j ACCEPT
@@ -176,15 +192,15 @@ iptables -A INPUT -p udp --dport 4500 -j ACCEPT
 iptables -A INPUT -p udp --dport 1701 -m policy --dir in --pol ipsec -j ACCEPT
 iptables -A INPUT -p udp --dport 1701 -j DROP
 
-# Shadowsocks
 iptables -A INPUT -p tcp --dport $SS_PORT -j ACCEPT
 iptables -A INPUT -p udp --dport $SS_PORT -j ACCEPT
 
-iptables -A FORWARD -i ppp+ -o eth0 -j ACCEPT
-iptables -A FORWARD -i eth0 -o ppp+ -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-iptables -t nat -A POSTROUTING -s 192.168.42.0/24 -o eth0 -j MASQUERADE
+iptables -A FORWARD -i ppp+ -o $DEF_IFACE -j ACCEPT
+iptables -A FORWARD -i $DEF_IFACE -o ppp+ -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -t nat -A POSTROUTING -s 192.168.42.0/24 -o $DEF_IFACE -j MASQUERADE
 
-iptables-save >/etc/iptables/rules.v4
+service iptables save
+systemctl restart iptables
 
 ### ===============================
 ### FAIL2BAN
@@ -195,32 +211,20 @@ cat >/etc/fail2ban/jail.local <<EOF
 [sshd]
 enabled = true
 port = ssh
-logpath = /var/log/auth.log
+logpath = /var/log/secure
 backend = systemd
 EOF
 
 systemctl enable fail2ban
-
-### ===============================
-### RC.LOCAL WORKAROUND
-### ===============================
-if [ ! -f /etc/rc.local ]; then
-cat >/etc/rc.local <<EOF
-#!/bin/sh
-modprobe pppol2tp
-systemctl restart ipsec
-systemctl restart xl2tpd
-exit 0
-EOF
-chmod +x /etc/rc.local
-fi
+systemctl restart fail2ban
 
 ### ===============================
 ### START SERVICES
 ### ===============================
 bigecho "Starting services..."
+
 systemctl enable ipsec xl2tpd
-systemctl restart ipsec xl2tpd fail2ban
+systemctl restart ipsec xl2tpd
 
 ### ===============================
 ### SHADOWSOCKS LINK
@@ -234,7 +238,7 @@ SS_LINK="ss://$SS_BASE64@$PUBLIC_IP:$SS_PORT"
 cat <<EOF
 
 ====================================
- IPsec VPN READY (Debian)
+ IPsec VPN READY (Rocky Linux)
 ====================================
  Server IP : $PUBLIC_IP
  Username  : $VPN_USER
