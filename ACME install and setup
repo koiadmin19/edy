@@ -1,0 +1,37 @@
+Install acme.sh
+
+curl https://get.acme.sh | sh
+
+register zerossl account with eab-kid and eab-hmac-key
+
+Current EAB_KID AND EAB_HMAC_KEY
+
+EAB_KID = IHaqnTbx6CyzmP0PlS1nCg
+
+EAB_HMAC_KEY = NYKtkJvUzG7s6deHSyXkNz2YfQ7EDldpYHsHN8cLzzf6RiF8e6c_adXLlHZckBQY8IhkG6zWpVzpOuTeuKN5Cg
+
+acme.sh --register-account --server zerossl --eab-kid IHaqnTbx6CyzmP0PlS1nCg --eab-hmac-key NYKtkJvUzG7s6deHSyXkNz2YfQ7EDldpYHsHN8cLzzf6RiF8e6c_adXLlHZckBQY8IhkG6zWpVzpOuTeuKN5Cg
+
+You can generate EAB credentials in zerossl. it is important not to generate again as we will need to update the current EAB credentials in 
+
+
+
+create /var/www/_letsencrypt directory and add the configuration on nginx/openresty conf file.
+
+mkdir /var/www/_letsencrypt -p;
+
+# Nginx Configuration
+# ACME-challenge
+location ^~ /.well-known/acme-challenge/ {
+    root /var/www/_letsencrypt;
+}
+
+
+install the certificate to its path
+
+acme.sh --install-cert -d mydomain.com --key-file  /software/ssl/mydomain.com/mydomain.com.key  --fullchain-file /software/ssl/mydomain.com/mydomain.com.crt
+
+
+check if the configuration is correct using openresty -t or nginx -t
+
+reload openresty/nginx or run tb
