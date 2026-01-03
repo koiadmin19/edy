@@ -1,0 +1,95 @@
+
+vim /var/www/html/.well-known/pki-validation/8D0176088EA2E0FEF529868B5AF41A7E.txt
+
+
+root@chanchan:/usr/local/openresty/nginx/conf
+
+
+henry_trend_111@chanchan:~$ sudo su
+root@chanchan:/home/henry_trend_111# vim a.sh
+root@chanchan:/home/henry_trend_111# chmod +x a.sh
+root@chanchan:/home/henry_trend_111# bash a.sh
+
+
+/usr/local/openresty/nginx/html
+
+copy file ini ke nginx/conf (boleh dihapus diganti atau diremark aja port 80 yg lama nya) setelah berhasil apply sertificat balikin lagi ke port 80 yg lama
+
+lama/aslinya
+
+https://136.114.113.249/
+136.114.113.249
+
+===========================================================
+script simple terpendek
+===========================================================
+events {}
+http {
+    server {
+        listen       80;
+        listen       443 ssl;
+#       listen       2025 ssl;
+
+        server_name  localhost;
+
+        ssl_certificate      cert.pem;
+        ssl_certificate_key  cert.key;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+			error_page   500 502 503 504  /50x.html;
+        
+		location = /50x.html {
+            root html;
+        }   
+      }  
+ }  
+================================================================		
+		
+ganti ini dulu untuk apply sertifkat
+
+
+events {}
+http {
+	server {
+		listen 80;
+		server_name localhost;
+	
+	root /var/www/html;
+
+    location /.well-known/pki-validation/ {
+        allow all;
+        default_type text/plain;
+    }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+ }
+} 
+
+===========================================================
+
+harusnya sudah berhasil
+https://34.92.114.118
+
+
+
+=======================
+
+mkdir -p /var/www/html/.well-known/pki-validation/
+vim /var/www/html/.well-known/pki-validation/09681C0862FCD10EE5C2D09933BC5139.txt
+ls -l /var/www/html/.well-known/pki-validation/
+
+cd /usr/local/openresty/nginx/conf/
+
+curl http://35.220.222.234/.well-known/pki-validation/09681C0862FCD10EE5C2D09933BC5139.txt
+
+
+https://35.220.222.234:2021/kefu.php?file=1669kefu_51220.mobileconfig
+
+
+
+
