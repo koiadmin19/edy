@@ -1,0 +1,806 @@
+temnplate ganti IP
+
+88
+https://git.yunwei99.cc/YunWei/scripts/src/branch/master/ip_server_88
+
+99-1
+https://git.yunwei99.cc/YunWei/scripts/src/branch/master/ip_server_991
+
+99-2
+https://git.yunwei99.cc/YunWei/scripts/src/branch/master/ip_server_992
+
+vim a.sh
+chmod +x  a.sh
+bash a.sh
+
+
+
+
+
+new ip
+https://34.92.118.19:1688/
+35.220.148.20
+
+
+pertamaaa
+
+=====================
+/root/conf_bak.sh
+rsync -avz root@34.92.118.19:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_b-bwin-01
+=====================
+new
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf root@35.220.148.20:/usr/local/openresty/nginx/conf/nginx.conf_b-bwin-01
+
+
+keduaaaa
+
+======================
+ssh root@35.220.148.20 mkdir -p /usr/local/openresty/nginx/html/bwin/bwin688bb.com/
+======================
+
+
+ketigaaaa
+
+====================
+/root/.tb.sh
+rsync -avz --progress /software/bwin/bwin688bb.com/ root@34.92.118.19:/usr/local/openresty/nginx/html/bwin/bwin688bb.com/
+====================
+new
+rsync -avz --progress /software/bwin/bwin688bb.com/ root@35.220.148.20:/usr/local/openresty/nginx/html/bwin/bwin688bb.com/
+
+
+
+
+
+
+===============================================
+
+
+https://34.84.2.6:9990
+https://34.84.2.6:9999/
+https://34.84.2.6:9999//wap/
+
+
+
+
+
+
+
+
+new ip
+34.84.193.216
+
+https://34.84.193.216:9990
+https://34.84.193.216:9999/ 
+https://34.84.193.216:9999//wap/
+
+
+
+pertamaaa
+
+=====================
+/root/conf_bak.sh
+rsync -avz -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" root@34.84.2.6:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_rdr365-nav-2
+=====================
+new
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf root@34.84.193.216:/usr/local/openresty/nginx/conf/nginx.conf_rdr365-nav-2
+
+
+keduaaaa
+
+======================
+
+
+ssh root@34.84.193.216 mkdir -p /software/3652站点/3652wall/
+rsync -avz --progress /software/3652站点/3652wall/ root@34.84.193.216:/software/3652站点/3652wall/
+
+ssh root@34.84.193.216 mkdir -p /software/3652站点/365e.co/v2/
+rsync -avz --progress /software/3652站点/365e.co/v2/ root@34.84.193.216:/software/3652站点/365e.co/v2/
+
+ssh root@34.84.193.216 mkdir -p /software/3652站点/www365vip.app/
+rsync -avz --progress /software/3652站点/www365vip.app/ root@34.84.193.216:/software/3652站点/www365vip.app/
+
+ssh root@34.84.193.216 mkdir -p /software/3652站点/365app03.com/3652365e.cc/
+rsync -avz --progress /software/3652站点/365app03.com/3652365e.cc/ root@34.84.193.216:/software/3652站点/365app03.com/3652365e.cc/
+======================
+
+
+ketigaaaa
+
+====================
+/root/.tb.sh
+
+====================
+new
+
+
+cert.pem
+cert.key
+
+=============================
+
+old
+https://34.92.57.111:38888
+
+
+new
+35.241.108.53
+
+https://35.241.108.53:38888
+https://35.241.108.53:28888
+https://35.241.108.53:18888
+
+
+/root/conf_bak.sh
+/root/.tb.sh
+
+ssh-keygen -R 35.241.108.53
+
+rsync -avz root@34.92.57.111:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_a-wns666-02-7338
+==
+
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf root@35.241.108.53:/usr/local/openresty/nginx/conf/nginx.conf_a-wns666-02-7338
+
+
+
+rsync -avz --progress /software/7338/主域名跳转2/ root@34.92.57.111:/usr/local/openresty/nginx/html/7338/主域名跳转2/
+==
+
+
+ssh root@35.241.108.53 mkdir -p /usr/local/openresty/nginx/html/7338/主域名跳转2/
+rsync -avz --progress /software/7338/主域名跳转2/ root@35.241.108.53:/usr/local/openresty/nginx/html/7338/主域名跳转2/
+
+
+=============================
+
+/root/conf_bak.sh
+/root/.tb.sh
+ssh-keygen -R 35.220.139.184
+
+old
+https://35.220.133.209:3657
+
+
+
+new
+35.220.139.184
+https://35.220.139.184:3657
+
+
+
+rsync -avz root@35.220.133.209:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_nav-platform-365-01
+
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf root@35.220.139.184:/usr/local/openresty/nginx/conf/nginx.conf_nav-platform-365-01
+
+=========
+/root/conf_bak.sh
+rsync -avz root@35.220.139.184:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_nav-platform-365-01
+============
+
+
+ssh root@35.220.139.184 mkdir -p /usr/local/openresty/nginx/html/365k站点/365导航落地页/
+ssh root@35.220.139.184 mkdir -p /usr/local/openresty/nginx/html/365k站点/365导航落地页_3656/
+
+
+
+/root/.tb.sh
+rsync -avz --progress /software/365k站点/365导航落地页/ root@35.220.139.184:/usr/local/openresty/nginx/html/365k站点/365导航落地页/
+rsync -avz --progress /software/365k站点/365导航落地页_3656/ root@35.220.139.184:/usr/local/openresty/nginx/html/365k站点/365导航落地页_3656/
+
+
+====
+#rsync -avz  /usr/local/openresty/nginx/conf/nginx.conf_nav-platform-365-01 root@35.220.139.184:/usr/local/openresty/nginx/conf/nginx.conf
+#ssh root@35.220.133.209 "openresty -s reload"
+#ssh root@35.220.133.209 "mkdir -p /usr/local/openresty/nginx/html/365k站点/365导航落地页/"
+rsync -avz --progress /software/365k站点/365导航落地页/ root@35.220.139.184:/usr/local/openresty/nginx/html/365k站点/365导航落地页/
+#ssh root@35.220.139.184 "mkdir -p /usr/local/openresty/nginx/html/365k站点/365导航落地页_3656/"
+rsync -avz --progress /software/365k站点/365导航落地页_3656/ root@35.220.133.209:/usr/local/openresty/nginx/html/365k站点/365导航落地页_3656/
+
+
+
+================
+
+old
+https://34.96.211.180:8888
+https://34.96.211.180:8880
+
+
+new
+34.96.146.227
+https://34.96.146.227:8888
+https://34.96.146.227:8880
+
+
+
+/root/conf_bak.sh
+/root/.tb.sh
+ssh-keygen -R 
+
+
+
+/root/conf_bak.sh
+root@34.96.211.180:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_188-ip-nav_replacement
+
+===
+
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf root@34.96.146.227:/usr/local/openresty/nginx/conf/nginx.conf_188-ip-nav_replacement
+ssh root@34.96.146.227 mkdir -p /usr/local/openresty/nginx/html/365k站点/365导航落地页/
+
+
+
+
+/root/.tb.sh
+rsync -avz --progress /software/188站点/188_nav_old/ root@34.96.146.227:/usr/local/openresty/nginx/html/188_nav_old/
+rsync -avz --progress /software/188站点/188_redirect_old/ root@34.96.146.227:/usr/local/openresty/nginx/html/188_redirect_old/
+
+
+
+==================
+
+https://35.187.219.9:9991
+https://34.146.198.22:9992
+
+
+
+
+
+
+34.153.197.172
+
+https://34.153.197.172:9991
+
+
+
+new
+
+
+
+
+/root/conf_bak.sh
+/root/.tb.sh
+ssh-keygen -R 
+
+
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf root@34.153.197.172:/usr/local/openresty/nginx/conf/nginx.conf_rdr-wb-02
+
+
+
+ssh root@34.153.197.172 mkdir -p /software/wanbo站点/main-wb/rdr_target2/
+
+
+rsync -avz --progress /usr/local/openresty/nginx/html root@34.153.197.172:/usr/local/openresty/nginx/html/
+
+
+rsync -avz --progress /software/wanbo站点/wanbo主域名跳转2/ root@34.153.197.172:/usr/local/openresty/nginx/html/wanbo主域名跳转2/
+
+/usr/local/openresty/nginx/html/wanbo主域名跳转2/
+
+
+
+
+https://34.150.96.43:48502
+
+
+/root/conf_bak.sh
+/root/.tb.sh
+ssh-keygen -R 
+
+
+
+https://35.241.120.79:48502
+35.241.120.79
+
+
+
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_b-wns888-01-9778
+
+
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf root@35.241.120.79:/usr/local/openresty/nginx/conf/nginx.conf_b-wns888-01-9778
+
+
+
+ssh root@35.241.120.79 mkdir -p /usr/local/openresty/nginx/html/wns888/www-9778c.com/
+
+
+rsync -avz --progress /software/wns888/www-9778c.com/ root@34.150.96.43:/usr/local/openresty/nginx/html/wns888/www-9778c.com
+
+rsync -avz --progress /software/wns888/www-9778c.com/ root@35.241.120.79:/usr/local/openresty/nginx/html/wns888/www-9778c.com/
+
+
+
+118.193.72.116
+
+165.154.32.9
+
+
+https://dl3.app-pj8.com/xiazai.html 
+
+
+
+
+dl3;app-pj8.com;A;118.107.45.47
+
+
+
+
+==================
+
+https://34.92.58.226:28888/
+34.92.58.226
+
+new
+https://35.220.184.186:28888/
+35.220.184.186
+
+
+/root/conf_bak.sh
+/root/.tb.sh
+ssh-keygen -R 
+
+
+rsync -avz root@34.92.58.226:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_a-wns888-03-9778
+====
+
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf root@35.220.184.186:/usr/local/openresty/nginx/conf/nginx.conf_a-wns888-03-9778
+
+
+
+ssh root@35.220.184.186 mkdir -p /usr/local/openresty/nginx/html/wns888/主域名跳转2/
+ssh root@35.220.184.186 mkdir -p /usr/local/openresty/nginx/html/wns888/77798-9778.com/
+
+
+
+
+
+rsync -avz --progress /software/wns888/主域名跳转2/ root@35.220.184.186:/usr/local/openresty/nginx/html/wns888/主域名跳转2/
+
+rsync -avz --progress /software/wns888/77798-9778.com/ root@35.220.184.186:/usr/local/openresty/nginx/html/wns888/77798-9778.com/
+
+
+
+
+rsync -avz root@35.220.184.186:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_a-wns888-03-9778
+
+
+
+==========
+
+
+/root/conf_bak.sh
+/root/.tb.sh
+ssh-keygen -R 
+ssh-keygen -R 34.150.107.155
+
+https://35.220.150.109:36013
+
+
+35.220.150.109
+
+
+new
+https://34.150.107.155:36013
+
+
+rsync -avz root@35.220.150.109:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_rdr-365-02
+
+
+rsync -avz root@34.150.107.155:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_rdr-365-02
+
+
+ssh root@34.150.107.155 mkdir -p /usr/local/openresty/nginx/html/ipredirect/
+ssh root@34.150.107.155 mkdir -p /usr/local/openresty/nginx/html/ipredirect_3656/
+
+
+
+#ssh root@35.220.150.109 "mkdir -p /usr/local/openresty/nginx/html/ipredirect/"
+rsync -avz --progress /software/3656站点/ipredirect/ root@35.220.150.109:/usr/local/openresty/nginx/html/ipredirect/
+#ssh root@35.220.150.109 "mkdir -p /usr/local/openresty/nginx/html/ipredirect_3656/"
+rsync -avz --progress /software/3656站点/ipredirect_3656/ root@35.220.150.109:/usr/local/openresty/nginx/html/ipredirect_3656/
+
+rsync -avz --progress /software/3656站点/ipredirect/ root@34.150.107.155:/usr/local/openresty/nginx/html/ipredirect/
+rsync -avz --progress /software/3656站点/ipredirect_3656/ root@34.150.107.155:/usr/local/openresty/nginx/html/ipredirect_3656/
+
+
+di walll
+
+
+old
+https://35.220.150.109:36013
+
+new
+https://34.150.107.155:36013
+
+
+==============
+
+
+https://34.150.87.69:9990
+https://34.150.87.69:9999
+https://34.150.87.69:9999/wap/
+changed to
+https://34.92.113.239:9990
+https://34.92.113.239:9999
+https://34.92.113.239:9999/wap/
+
+https://34.92.113.239
+
+
+
+麻烦把主域名跳转从 https://34.150.87.69:9990
+ 改成 https://34.92.113.239:9990
+
+域名：365e.com , dd365.com
+
+
+/root/conf_bak.sh
+/root/.tb.sh
+
+
+
+rsync -avz -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" root@34.92.113.239:/usr/local/openresty/nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf_rdr365-new
+
+
+rsync -avz /usr/local/openresty/nginx/conf/nginx.conf root@34.92.113.239:/usr/local/openresty/nginx/conf/nginx.conf_rdr365-new
+
+
+
+ssh root@34.150.87.69 "mkdir -p /software/3652站点/3652wall/"
+rsync -avz --progress /software/3652站点/3652wall/ root@34.150.87.69:/software/3652站点/3652wall/
+
+ssh root@34.150.87.69 "mkdir -p /software/3652站点/365e.co/v2/"
+rsync -avz --progress /software/3652站点/365e.co/v2/ root@34.150.87.69:/software/3652站点/365e.co/v2/
+
+ssh root@34.150.87.69 "mkdir -p /software/3652站点/www365vip.app/"
+rsync -avz --progress /software/3652站点/www365vip.app/ root@34.150.87.69:/software/3652站点/www365vip.app/
+
+ssh root@34.150.87.69 "mkdir -p /software/3652站点/365app03.com/3652365e.cc/"
+rsync -avz --progress /software/3652站点/365app03.com/3652365e.cc/ root@34.150.87.69:/software/3652站点/365app03.com/3652365e.cc/
+
+
+===============
+
+https://34.92.113.239
+
+
+ssh root@34.92.113.239 mkdir -p /software/3652站点/3652wall/
+rsync -avz --progress /software/3652站点/3652wall/ root@34.92.113.239:/software/3652站点/3652wall/
+
+ssh root@34.92.113.239 mkdir -p /software/3652站点/365e.co/v2/
+rsync -avz --progress /software/3652站点/365e.co/v2/ root@34.92.113.239:/software/3652站点/365e.co/v2/
+
+ssh root@34.92.113.239 mkdir -p /software/3652站点/www365vip.app/
+rsync -avz --progress /software/3652站点/www365vip.app/ root@34.92.113.239:/software/3652站点/www365vip.app/
+
+ssh root@34.92.113.239 mkdir -p /software/3652站点/365app03.com/3652365e.cc/
+rsync -avz --progress /software/3652站点/365app03.com/3652365e.cc/ root@34.92.113.239:/software/3652站点/365app03.com/3652365e.cc/
+
+
+
+
+
+==============================
+
+dari notepad
+
+#Telegram account
++855 96 216 2439
+
+
+调整了重新下载试试
+Adjusted and tried downloading again
+
+
+
+这个域名已经谷歌拦截，不能处理  
+This domain name has been blocked by Google and cannot be processed.
+
+
+谷歌阻止 不能处理
+Google blocked cannot process
+
+帮忙加下这两个域名的证书记录
+Please help me add the certificate records of these two domain names
+
+
+这条已经被墙没有用这条了
+This one has been blocked and is no longer used.
+
+
+好的，请看一下
+OK, please take a look
+
+
+换
+changed
+
+
+好的，请重试
+OK, please try again
+
+可以了谢谢
+That's ok, thank you
+
+
+
+可以安装，无法打开
+Can be installed, cannot be opened
+
+可以了谢谢
+It's OK, thank you
+
+好的 谢谢
+Okay, thanks
+
+都正常
+All normal
+
+正常
+normal
+
+
+在清洗中 好了会通知,
+同时可以使用 www.wanbo.vip
+Cleaning in progress. Will notify you when it is done.
+You can also use www.wanbo.vip
+
+
+
+仍在处理。
+Still processing
+
+
+测试这里手机、电脑均正常
+Tested here, mobile phones and computers are all normal
+
+再试下 已经换这条了
+https://wanbo005.com
+Try again. This one has been replaced.
+https://h.365k95.com
+
+
+好了
+旧链接 https://www.3115dh33.com/
+新链接 https://www.3115dh35.com/
+
+
+好了
+旧链接 https://a.3656vip5.cc
+新链接 https://b.www365kvip.net
+
+
+
+好的 稍等
+hold on
+
+好的，现在好多了，而且仍然有效
+Ok, it's much better now and it still works
+
+在
+exist
+
+Edy 休息
+rest
+
+
+Ada = 有 = Yǒu
+
+Tidak Ada = 没有 = Méi Yǒu
+
+
+请再试一次。 IP 替换为 18.178.67.51
+Please try again. Replace IP with 18.178.67.51
+
+
+
+help make sure its can open, good in itdog and same page
+
+
+这条被墙了
+先使用 www 的 https://www.3656vip9.cc
+
+:%s/kata_lama/kata_baru/g
+
+:%s/a.3656dh1.my/e.3656dhk.live/g
+
+=======================================================================
+grep -rl 2024 | grep -v bak | xargs sed -i.bak-$(date +"%Y%m%d_%H%M%S") 's|2024|2025|g'
+
+=======================================================================
+OLD=oldlink ; NEW=newlink ; grep -rl $OLD | grep -v .bak | xargs sed -i.bak-$(date +"%Y%m%d_%H%M%S") "s|$OLD|$NEW|g"
+
+======================================================================
+
+==========
+password pinboot
+0Ps.99.F3ng!!
+
+
+
+vault
+password : VvYgcTJy4yq2E
+=================================
+
+@;3656005.com;A;34.92.248.203
+www;3656005.com;A;34.92.248.203
+                                                                                                                                                   
+=================================
+tambah hanya sub domain, sample
+abc;saibo789.vip;A;35.189.128.199
+vip;saibo789.vip;A;35.189.128.199
+
+edy;testingdomain99.cc;A;34.92.248.203
+====================================
+
+_E46D0FEF8A4F551D66B155B4F6506F88;sj9778.vip;CNAME;D009C5237C5AB1F75DACF32967D16B07.4E77BE6E96075B172F4625157FE7C10D.0380f85e9549018.comodoca.com
+
+====================================
+
+cara copy file sekaligus banyak
+
+tee 365b.36569zxjk.cc.conf 365c.36569zxjk.cc.conf 365d.36569zxjk.cc.conf < 365q.36569zxjk.cc.conf
+
+===============================
+
+
+
+==================================
+
+
+lain kali jika mengkonfigurasi domain baru, cukup salin www-9778jj.com.conf ke new_domain.conf,
+ubah nama_server & sertifikat.
+perlu membuat direktori baru
+tapi jangan lupa ganti domain di ./static/js/zy.js ke domain baru
+
+rubah juga link di dalam ini
+/software/wns888/www-9778jj.com/static/js
+vim zy.js
+
+
+==============================
+
+contoh:
+a.3656vip2509.cc
+g.3656azjul11.cc
+
+domain diatas kita arahkan untuk record value menggunakan platform  
+site.36ok56cname.com
+
+dan jika di ping ip platform itu adalah
+20.239.97.157
+
+tetapi jika halaman link itu bukan platform akan diarahkan ke server kita sendiri
+
+账号 ： damimii615@gmail.com
+密码： feichang666A*
+
+
+
+103.150.11.226
+root
+ppqjTJBZ8487
+==============
+https://103.150.11.226:12700/94a2f495
+ username: wj9bkjcs
+ password: 921144fb
+===========================================================================
+
+http://34.96.234.46:8904
+
+=========================================================================
+99-2
+root@upstream-hk:/usr/local/openresty/nginx/html/index_365p.html
+
+root@upstream-hk:/usr/local/openresty/nginx/html#
+
+/usr/local/openresty/nginx/html/index_365p.html
+==============================================================================
+99-1
+
+root@cleaner:/usr/local/openresty/nginx/html#
+
+==============================================================================
+
+
+Email:testiphone1199@gmail.com
+password:Tester1199
+apple ID
+
+=================================
+
+
+prompt untuk bisa terbang
+=============
+a boy flying low over the sea, he feet hovering above the surface of the sea water causing water splashes, wind blowing, waves crashing. Camera zoom
+
+==========================================
+
+https://www.365p-app.net/xiazai.html
+https://www.app-pj8.com/xiazai.html
+https://app-wns888.net/xiazai.html
+
+https://3656-app.vip/xiazai.html
+https://www.getappwb01.xyz/xiazai.html
+https://uedbet988.com:8989/mobile-client/ued/index.html?td_channelid=1600#/download
+
+https://www.365e.co/xiazai.html
+=======================================
+
+https://homepage.yunwei99.cc/
+
+https://vault.yunwei99.cc/#/vault
+
+
+js
+username : edy
+passsword : a1b2c3
+
+Vault
+username : edy@vault.qsjtyw.com
+password : VvYgcTJy4yq2E
+
+password email
+dogitteam@gmail.com
+password  : 123.shui#123
+
+password pinboot
+0Ps.99.F3ng!!
+
+password pc : 123.shuii
+
+
+git.qsjtyw.com
+
+
+===============
+
+https://homepage.yunwei99.cc/
+https://vault.yunwei99.cc/#/vault
+https://www.dynadot.com/account/sign-in
+https://3656.tstdmn.cc/index.php?module=SitesManager&action=index&idSite=1&period=day&date=yesterday
+https://dash.cloudflare.com/login
+https://account.alibabacloud.com/
+https://js.yunwei99.cc/luna/?_=1750614380930
+https://js.zhiboyw.cc/luna/?_=1750615373290&oid=00000000-0000-0000-0000-000000000002
+https://console.huodunyun.com/#/login
+https://docs.google.com/spreadsheets/d/1h1ye4gXC-XB2a8qAcjd5cloxeX9dAkeNLejmj_4DygA/edit?gid=256616289#gid=256616289
+https://docs.google.com/spreadsheets/d/1H-0K1inMpNFBGbjqjtHnA0b8Nlp91MKE5NGgTNXcksg/edit?pli=1&gid=449050029#gid=449050029
+https://docs.google.com/spreadsheets/d/1UpvooIL2Bdn0HREgBgpxedRs230184s5/edit?pli=1&gid=501058492#gid=501058492
+https://wall.wall301tiaozhuan.com/domains/redirect
+https://main.wall365p.cc/domains/redirect
+https://wall.zhibowallmg.com/domains/redirect
+https://app.zerossl.com/certificates
+https://myssl.com/chain_download.html
+https://www.itdog.cn/http/
+https://www.sslshopper.com/ssl-checker.html
+
+
+
+
+or backend , for now no problem, if have error let me know, can use already
+
+3656
+http://3656.yunwei99.cc/
+user : admin
+pass : 365k123
+
+88
+https://yuming.wisdomade.com/
+user : admin
+pass : zhongpan88
+
+3659
+http://3659.yunwei99.cc/
+user : admin
+pass : pujing123
+
+
+https://kb.yunwei99.cc/books/change-ip-server/page/server-ip 
+
+if have time help to try..
+so if need to improve i will add
+should be time to create new server until replace in master, no more then 20 minutes if we create 2 - 3 server
+
+
+
+
+
