@@ -1,0 +1,93 @@
+take an old mobileconfig file, for example from mobileconfig 365p and change name with new app name
+ex : 
+old mobileconfig
+365pkefu.mobileconfig
+changed to
+new mobileconfig
+uu365.mobileconfig
+
+
+now, focus with new file name -----> uu365.mobileconfig
+
+
+create new crt, key, and pem, for this can follow this page 
+https://kb.yunwei99.cc/books/general/page/ios-kefu-update
+create a certificate, for example, with SSL zero. After obtaining the private.key, certificated.crt, and ssl.pem files, place them in a folder, for example, uu365 (containing five files).
+1. certificated.crt
+2. private.key
+3. ssl.pem
+4. uu365.mobileconfig
+5. generate.sh
+dont forget to edit generate.sh file with notepad++ or anything
+ex :
+
+
+UNSIGNED_FILE="unsigned_uu365.mobileconfig"
+CRT_FILE="dl.uu365news.cc.crt"                        ------------->>> this optional can use others name like certificated.crt
+KEY_FILE="dl.uu365news.cc.key"                       ------------->>> this optional can use others name like private.key
+PEM_FILE="dl.uu365news.cc_ssl.pem"               ------------->>> this optional can use others name like ssl.pem
+# the output file
+NEW_SIGNED_FILE="uu365v10.mobileconfig"  ------------->>> give new file name ex : uu365v10.mobileconfig
+
+openssl smime -sign -in ${UNSIGNED_FILE} -out ${NEW_SIGNED_FILE} -signer ${CRT_FILE} -inkey ${KEY_FILE} -certfile ${PEM_FILE} -outform der -nodetach
+
+
+
+save and copy folder uu365 to macbook
+
+
+open terminal and run (for get newfile unsign) -------->>> unsigned_uu365.mobileconfig
+security cms -D -i uu365.mobileconfig -o unsigned_uu365.mobileconfig
+
+
+ now 1 folder contains 6 files
+
+
+
+
+copy and edit unsigned_uu365.mobileconfig with notapad++ or anything in ur pc(windows)
+ex: change everything word old name to new name  =========>>>  Label, DisplayName, what you want to change it
+
+
+change PayloadIdentifierID / UUID (Unique Identifier) to new ID with same format but different words, this unik ID for payload (profil) in iOS. for ex :
+1. 365p change to uu365live
+2. old ID :   01A5BC72-B69C-11EE-A506-0242AC120002
+   new ID :  A8C12F30-92D4-4B6A-9C11-8F4A12345678
+
+
+
+
+changed link <data>picturecode</data> 
+open this site : https://gchq.github.io/CyberChef/   and follow step 1-4
+
+
+copy and change old code with new code (step 4) in unsigned_uu365.mobileconfig when still open with notepad++
+
+
+
+
+at this point, steps to edit the unsigned_uu365.mobileconfig file have been completed
+
+
+copy back  unsigned_uu365.mobileconfig file to macbook and run in terminal
+sh generate.sh
+(open from folder uu365) 
+
+now 1 folder contains 7 files (with new mobileconfig)
+
+
+
+optional :  can use uu365v10.mobileconfig or still use old mobileconfig uu365.mobileconfig
+
+
+
+at this point is finish. put or replace new mobileconfig to ur directory in jumpserver and dont forget to do restart openresty or tb, see yaaaaa
+
+
+try to download and install on iphone/iOS
+
+
+
+    
+
+
